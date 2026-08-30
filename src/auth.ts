@@ -1,13 +1,12 @@
 import NextAuth from "next-auth";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { accounts, profiles } from "@/db/schema";
+import { accounts } from "@/db/schema";
 import { authConfig } from "@/auth.config";
+import { persistGithubUser } from "@/lib/persist-github-user";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: DrizzleAdapter(db),
   logger: {
     error(...args: unknown[]) {
       console.error("AUTH_ERROR", ...args);
@@ -19,60 +18,48 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       console.debug("AUTH_DEBUG", ...args);
     },
   },
-  events: {
-    async signIn({ user, profile, account }) {
-      if (!user.id || account?.provider !== "github") {
-        return;
+  callbacks: {
+    ...authConfig.callbacks,
+    async jwt({ token, user, account, profile }) {
+      if (account?.provider === "github") {
+        try {
+          const userId = await persistGithubUser({
+            account: {
+              providerAccountId: account.providerAccountId,
+              access_token: account.access_token,
+              refresh_token: account.refresh_token,
+              expires_at: account.expires_at,
+              token_type: account.token_type,
+              scope: account.scope,
+              id_token: account.id_token,
+              session_state: account.session_state,
+            },
+            profile: profile as {
+              id?: number | string;
+              login?: string;
+              name?: string | null;
+              email?: string | null;
+              bio?: string | null;
+              company?: string | null;
+              location?: string | null;
+              avatar_url?: string;
+              html_url?: string;
+            },
+            user,
+          });
+          token.sub = userId;
+          console.info("AUTH_PERSIST_OK", { userId, login: (profile as { login?: string } | undefined)?.login });
+        } catch (error) {
+          console.error("AUTH_PERSIST_FAILED", error);
+          throw error;
+        }
+        return token;
       }
 
-      const githubProfile = profile as
-        | {
-            id?: number | string;
-            login?: string;
-            name?: string | null;
-            bio?: string | null;
-            company?: string | null;
-            location?: string | null;
-            avatar_url?: string;
-            html_url?: string;
-          }
-        | undefined;
-
-      const login = githubProfile?.login;
-      const githubId = githubProfile?.id ? String(githubProfile.id) : account.providerAccountId;
-
-      if (!login) {
-        return;
+      if (user?.id) {
+        token.sub = user.id;
       }
-
-      await db
-        .insert(profiles)
-        .values({
-          userId: user.id,
-          githubId,
-          login,
-          name: githubProfile?.name ?? user.name ?? login,
-          bio: githubProfile?.bio ?? null,
-          company: githubProfile?.company ?? null,
-          location: githubProfile?.location ?? null,
-          avatarUrl: githubProfile?.avatar_url ?? user.image ?? null,
-          htmlUrl: githubProfile?.html_url ?? `https://github.com/${login}`,
-          updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: profiles.userId,
-          set: {
-            githubId,
-            login,
-            name: githubProfile?.name ?? user.name ?? login,
-            bio: githubProfile?.bio ?? null,
-            company: githubProfile?.company ?? null,
-            location: githubProfile?.location ?? null,
-            avatarUrl: githubProfile?.avatar_url ?? user.image ?? null,
-            htmlUrl: githubProfile?.html_url ?? `https://github.com/${login}`,
-            updatedAt: new Date(),
-          },
-        });
+      return token;
     },
   },
 });

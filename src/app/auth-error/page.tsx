@@ -4,7 +4,7 @@ const MESSAGES: Record<string, string> = {
   Configuration: "Auth.js is missing a required environment variable, or the GitHub OAuth app settings do not match this deployment.",
   AccessDenied: "GitHub denied access. Grant the requested read-only permissions and try again.",
   Verification: "This sign-in link is invalid or has expired.",
-  OAuthCallback: "GitHub returned to the app, but the sign-in could not be completed. Confirm AUTH_URL, the GitHub callback URL, and that database migrations have been applied.",
+  OAuthCallback: "GitHub returned to the app, but Auth.js could not finish the callback. If this persists after a redeploy, the GitHub client secret, AUTH_SECRET, or Neon migrations are the next things to check.",
   OAuthAccountNotLinked: "This GitHub account could not be linked to an existing user.",
   Default: "Sign-in failed. Try again, or check Vercel logs for AUTH_ERROR.",
 };
