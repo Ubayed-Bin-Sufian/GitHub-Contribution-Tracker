@@ -31,8 +31,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               expires_at: account.expires_at,
               token_type: account.token_type,
               scope: account.scope,
-              id_token: account.id_token,
-              session_state: account.session_state,
+              id_token: typeof account.id_token === "string" ? account.id_token : null,
+              session_state: typeof account.session_state === "string" ? account.session_state : null,
             },
             profile: profile as {
               id?: number | string;
