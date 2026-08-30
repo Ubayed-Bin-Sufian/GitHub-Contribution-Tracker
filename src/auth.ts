@@ -8,6 +8,17 @@ import { authConfig } from "@/auth.config";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: DrizzleAdapter(db),
+  logger: {
+    error(code, metadata) {
+      console.error("AUTH_ERROR", code, metadata);
+    },
+    warn(code) {
+      console.warn("AUTH_WARN", code);
+    },
+    debug(code, metadata) {
+      console.debug("AUTH_DEBUG", code, metadata);
+    },
+  },
   events: {
     async signIn({ user, profile, account }) {
       if (!user.id || account?.provider !== "github") {
