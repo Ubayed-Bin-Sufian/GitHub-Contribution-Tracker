@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(63, 185, 80, 0.12), transparent 50%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56, 139, 253, 0.08), transparent 42%),
+    #0b1117;
+  color: #e6edf3;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a3644 transparent;
+}
+
+.card {
+  @apply rounded-2xl border border-line bg-canvas-card shadow-card;
+}
+
+.stat-label {
+  @apply text-xs font-medium uppercase tracking-[0.18em] text-ink-faint;
+}
+
+.heatmap-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+}
