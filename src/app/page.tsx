@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { GitBranch, ShieldCheck, BarChart3, RefreshCw } from "lucide-react";
 import { auth } from "@/auth";
-import { signInWithGithub } from "@/app/actions";
+import { GithubSignInButton } from "@/components/github-sign-in-button";
 
 export default async function HomePage() {
   const session = await auth();
@@ -24,14 +24,9 @@ export default async function HomePage() {
             Sign in with GitHub to analyze commits, pull requests, issues, and reviews. Data is stored
             for your account only. This application never modifies your repositories.
           </p>
-          <form action={signInWithGithub} className="mt-8">
-            <button
-              type="submit"
-              className="rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-black hover:bg-brand-dim"
-            >
-              Sign in with GitHub
-            </button>
-          </form>
+          <div className="mt-8">
+            <GithubSignInButton />
+          </div>
         </div>
         <div className="grid gap-4">
           {[

@@ -122,7 +122,7 @@ Complementary catalog options if you expand later: Pydantic Logfire (observabili
 1. Push this repository to GitHub
 2. Import the project in [Vercel](https://vercel.com) (Hobby plan)
 3. Set the same environment variables as `.env.example`
-4. Set `AUTH_URL` and `NEXT_PUBLIC_APP_URL` to `https://<your-project>.vercel.app`
+4. Set `AUTH_URL`, `AUTH_TRUST_HOST=true`, and `NEXT_PUBLIC_APP_URL` to `https://<your-project>.vercel.app`
 5. Add a production GitHub OAuth callback: `https://<your-project>.vercel.app/api/auth/callback/github`
 6. Provision a free Neon (or other) Postgres database and set `DATABASE_URL`
 7. After the first deploy, run migrations against that database:
@@ -132,6 +132,13 @@ DATABASE_URL='your-production-url' node scripts/migrate.mjs
 ```
 
 8. Redeploy if needed. The app stays on Vercel Hobby + GitHub OAuth + a free Postgres plan.
+
+If GitHub sign-in redirects back and fails, confirm all of these match the production domain:
+
+- GitHub OAuth **Authorization callback URL** is `https://<your-project>.vercel.app/api/auth/callback/github`
+- `AUTH_URL` and `NEXT_PUBLIC_APP_URL` are that same origin (no trailing slash)
+- `AUTH_SECRET`, `AUTH_GITHUB_ID`, and `AUTH_GITHUB_SECRET` are set in Vercel
+- `DATABASE_URL` points at Neon and `node scripts/migrate.mjs` has been run against it
 
 ## Security
 

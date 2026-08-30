@@ -9,14 +9,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: DrizzleAdapter(db),
   logger: {
-    error(error) {
-      console.error("AUTH_ERROR", error);
+    error(...args: unknown[]) {
+      console.error("AUTH_ERROR", ...args);
     },
-    warn(code) {
-      console.warn("AUTH_WARN", code);
+    warn(...args: unknown[]) {
+      console.warn("AUTH_WARN", ...args);
     },
-    debug(code, metadata) {
-      console.debug("AUTH_DEBUG", code, metadata);
+    debug(...args: unknown[]) {
+      console.debug("AUTH_DEBUG", ...args);
     },
   },
   events: {

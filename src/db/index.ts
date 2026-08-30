@@ -8,11 +8,14 @@ const globalForDb = globalThis as unknown as {
   postgres?: ReturnType<typeof postgres>;
 };
 
+const neonLike = url.includes("neon.tech") || url.includes("sslmode=require");
+
 export const client =
   globalForDb.postgres ??
   postgres(url, {
     max: 1,
     prepare: false,
+    ...(neonLike ? { ssl: "require" as const } : {}),
   });
 
 if (process.env.NODE_ENV !== "production") {

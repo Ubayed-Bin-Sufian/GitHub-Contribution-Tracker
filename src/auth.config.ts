@@ -11,6 +11,7 @@ const protectedPrefixes = [
 ];
 
 export const authConfig = {
+  trustHost: true,
   providers: [
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
@@ -24,6 +25,7 @@ export const authConfig = {
   ],
   pages: {
     signIn: "/",
+    error: "/auth-error",
   },
   session: {
     strategy: "jwt",
