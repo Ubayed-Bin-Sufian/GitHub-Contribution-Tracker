@@ -8,14 +8,15 @@ import { persistGithubUser } from "@/lib/persist-github-user";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   logger: {
-    error(...args: unknown[]) {
-      console.error("AUTH_ERROR", ...args);
+    error(error) {
+      const err = error as { name?: string; message?: string; cause?: unknown };
+      console.error("AUTH_ERROR", err?.name, err?.message, err?.cause);
     },
-    warn(...args: unknown[]) {
-      console.warn("AUTH_WARN", ...args);
+    warn(code) {
+      console.warn("AUTH_WARN", code);
     },
-    debug(...args: unknown[]) {
-      console.debug("AUTH_DEBUG", ...args);
+    debug() {
+      // Do not log Auth.js debug payloads — they can include client secrets.
     },
   },
   callbacks: {
